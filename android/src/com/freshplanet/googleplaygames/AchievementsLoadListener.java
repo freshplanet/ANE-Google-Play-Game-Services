@@ -34,7 +34,7 @@ public class AchievementsLoadListener implements OnAchievementsLoadedListener{
 			Iterator<Achievement> iterator = achBuffer.iterator();
 			while(iterator.hasNext()){
 				Achievement achievement = iterator.next();
-				if(achievement.getType() == Achievement.TYPE_INCREMENTAL && achievement.getAchievementId() == achievementId)
+				if(achievement.getType() == Achievement.TYPE_INCREMENTAL && achievement.getAchievementId().equals(achievementId))
 				{
 				    this.incrementAchievementWhenDataIsLoaded(achievement);
 				}

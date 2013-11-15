@@ -157,11 +157,6 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
     public GameHelper(Activity activity) {
         mActivity = activity;
     }
-    
-    public GameHelper(Activity activity, boolean autoSignin) {
-    	mActivity = activity;
-    	mAutoSignIn = autoSignin;
-    }
 
     static private final int TYPE_DEVELOPER_ERROR = 1001;
     static private final int TYPE_GAMEHELPER_BUG = 1002;
@@ -349,6 +344,11 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
      */
     public SignInFailureReason getSignInError() {
         return mSignInFailureReason;
+    }
+
+    public void onStart(Activity act, boolean tryAutoSignIn) {
+    	mAutoSignIn = tryAutoSignIn;
+    	onStart(act);
     }
 
     /** Call this method from your Activity's onStart(). */
@@ -860,6 +860,7 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
             // sign in.
             debugLog("onConnectionFailed: since user didn't initiate sign-in, failing now.");
             mConnectionResult = result;
+            //mAutoSignIn = false;
             setState(STATE_DISCONNECTED);
             notifyListener(false);
             return;

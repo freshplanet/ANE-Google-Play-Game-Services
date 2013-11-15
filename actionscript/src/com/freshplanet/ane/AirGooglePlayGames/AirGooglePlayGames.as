@@ -18,7 +18,6 @@
 
 package com.freshplanet.ane.AirGooglePlayGames
 {
-	import flash.display.BitmapData;
 	import flash.events.EventDispatcher;
 	import flash.events.StatusEvent;
 	import flash.external.ExtensionContext;
@@ -63,11 +62,11 @@ package com.freshplanet.ane.AirGooglePlayGames
 			return _instance ? _instance : new AirGooglePlayGames();
 		}
 		
-		public function startAtLaunch(wasSignedIn:Boolean):void
+		public function startAtLaunch():void
 		{
 			if (AirGooglePlayGames.isSupported)
 			{
-				_context.call("startAtLaunch", wasSignedIn);
+				_context.call("startAtLaunch");
 			}
 		}
 		

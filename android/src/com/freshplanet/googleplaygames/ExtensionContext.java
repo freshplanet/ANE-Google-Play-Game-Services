@@ -18,7 +18,9 @@
 
 package com.freshplanet.googleplaygames;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
@@ -32,6 +34,7 @@ import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesReportScoreFu
 import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesShowAchievementsFunction;
 import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesSignInFunction;
 import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesSignOutFunction;
+import com.freshplanet.googleplaygames.functions.AirGooglePlayStartAtLaunch;
 import com.google.android.gms.games.GamesClient;
 
 public class ExtensionContext extends FREContext implements GameHelper.GameHelperListener
@@ -42,8 +45,6 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 	
 	public static GameHelper mHelper;
 	
-	public static boolean AUTOSIGNIN;
-	
 	@Override
 	public void dispose() { }
 
@@ -51,7 +52,7 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 	public Map<String, FREFunction> getFunctions()
 	{
 		Map<String, FREFunction> functionMap = new HashMap<String, FREFunction>();
-		functionMap.put("startAtLaunch", new AirGooglePlayGamesSignInFunction());
+		functionMap.put("startAtLaunch", new AirGooglePlayStartAtLaunch());
 		functionMap.put("signIn", new AirGooglePlayGamesSignInFunction());
 		functionMap.put("signOut", new AirGooglePlayGamesSignOutFunction());
 		functionMap.put("reportAchievemnt", new AirGooglePlayGamesReportAchievementFunction());
@@ -87,17 +88,22 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 		if (mHelper == null)
 		{
 			logEvent("create helper");
-			mHelper = new GameHelper(activity, AUTOSIGNIN);
+			mHelper = new GameHelper(activity);
 			logEvent("setup");
 			mHelper.setup(this, GameHelper.CLIENT_GAMES);
 		}
 		return mHelper;
 	}
+
+	private List<Activity> _activityInstances;
 	
-	public void signIn()
+	public void registerActivity(Activity activity)
 	{
-		logEvent("signIn");
-		mHelper.beginUserInitiatedSignIn();
+		if (_activityInstances == null)
+		{
+			_activityInstances = new ArrayList<Activity>();
+		}
+		_activityInstances.add(activity);
 	}
 	
 	public void signOut()
@@ -145,12 +151,34 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 	public void onSignInFailed() {
 		logEvent("onSignInFailed");
 		dispatchEvent("ON_SIGN_IN_FAIL");
+		if (_activityInstances != null)
+		{
+			for (Activity activity : _activityInstances)
+			{
+				if (activity != null)
+				{
+					activity.finish();
+				}
+			}
+			_activityInstances = null;
+		}
 	}
 
 	@Override
 	public void onSignInSucceeded() {
 		logEvent("onSignInSucceeded");
 		dispatchEvent("ON_SIGN_IN_SUCCESS");
+		if (_activityInstances != null)
+		{
+			for (Activity activity : _activityInstances)
+			{
+				if (activity != null)
+				{
+					activity.finish();
+				}
+			}
+			_activityInstances = null;
+		}
 	}
 	
 }

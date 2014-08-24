@@ -35,6 +35,8 @@ import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesShowAchieveme
 import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesSignInFunction;
 import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesSignOutFunction;
 import com.freshplanet.googleplaygames.functions.AirGooglePlayStartAtLaunch;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesClient;
 
 public class ExtensionContext extends FREContext implements GameHelper.GameHelperListener
@@ -88,9 +90,9 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 		if (mHelper == null)
 		{
 			logEvent("create helper");
-			mHelper = new GameHelper(activity);
+			mHelper = new GameHelper(activity, GameHelper.CLIENT_GAMES | GameHelper.CLIENT_PLUS);
 			logEvent("setup");
-			mHelper.setup(this, GameHelper.CLIENT_GAMES);
+			mHelper.setup(this);
 		}
 		return mHelper;
 	}
@@ -120,8 +122,8 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
         return mHelper.isSignedIn();
 	}
 	
-	public GamesClient getGamesClient() {
-        return mHelper.getGamesClient();
+	public GoogleApiClient getApiClient() {
+        return mHelper.getApiClient();
     }
 
 	
@@ -130,7 +132,7 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
     	if (!isSignedIn()) {
             return;
         }
-    	getGamesClient().unlockAchievement(achievementId);
+    	Games.Achievements.unlock(getApiClient(), achievementId);
 	}
 
 	
@@ -138,13 +140,13 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 	{
 		if (percentDouble > 0 && percentDouble <= 1){
     		int percent = (int) (percentDouble * 100);
-    		getGamesClient().loadAchievements(new AchievementsLoadListener(achievementId, percent));
+    		Games.Achievements.increment(getApiClient(), achievementId, percent);
     	}
 	}
 	
 	public void reportScore(String leaderboardId, int highScore)
 	{
-    	getGamesClient().submitScore(leaderboardId, highScore);
+		Games.Leaderboards.submitScore(getApiClient(), leaderboardId, highScore);
 	}
 
 	@Override

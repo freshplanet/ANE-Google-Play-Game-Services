@@ -4,6 +4,7 @@ import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
 import com.adobe.fre.FREObject;
 import com.freshplanet.googleplaygames.Extension;
+import com.google.android.gms.games.Games;
 
 public class AirGooglePlayGamesShowAchievementsFunction implements FREFunction {
 	
@@ -18,7 +19,7 @@ public class AirGooglePlayGamesShowAchievementsFunction implements FREFunction {
 
 		Extension.context.createHelperIfNeeded(arg0.getActivity());
         if (Extension.context.isSignedIn()) {
-        	arg0.getActivity().startActivityForResult(Extension.context.getGamesClient().getAchievementsIntent(), RC_UNUSED);
+        	arg0.getActivity().startActivityForResult(Games.Achievements.getAchievementsIntent(Extension.context.getApiClient()), RC_UNUSED);
         }
 		
 		return null;

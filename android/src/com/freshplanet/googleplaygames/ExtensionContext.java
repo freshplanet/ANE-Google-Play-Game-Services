@@ -18,17 +18,13 @@
 
 package com.freshplanet.googleplaygames;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import android.app.Activity;
 import android.util.Log;
 
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
 import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesGetActivePlayerName;
+import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesGetLeaderboardFunction;
 import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesReportAchievementFunction;
 import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesReportScoreFunction;
 import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesShowAchievementsFunction;
@@ -37,7 +33,19 @@ import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesSignOutFuncti
 import com.freshplanet.googleplaygames.functions.AirGooglePlayStartAtLaunch;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
-import com.google.android.gms.games.GamesClient;
+import com.google.android.gms.games.Player;
+import com.google.android.gms.games.leaderboard.LeaderboardScore;
+import com.google.android.gms.games.leaderboard.LeaderboardScoreBuffer;
+import com.google.android.gms.games.leaderboard.LeaderboardVariant;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ExtensionContext extends FREContext implements GameHelper.GameHelperListener
 {
@@ -61,7 +69,8 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 		functionMap.put("reportScore", new AirGooglePlayGamesReportScoreFunction());
 		functionMap.put("showStandardAchievements", new AirGooglePlayGamesShowAchievementsFunction());
 		functionMap.put("getActivePlayerName", new AirGooglePlayGamesGetActivePlayerName());
-		return functionMap;	
+        functionMap.put("getLeaderboard", new AirGooglePlayGamesGetLeaderboardFunction());
+		return functionMap;
 	}
 	
 	public void dispatchEvent(String eventName)
@@ -148,6 +157,48 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 	{
 		Games.Leaderboards.submitScore(getApiClient(), leaderboardId, highScore);
 	}
+
+    public void getLeaderboard( String leaderboardId ) {
+
+		Games.Leaderboards.loadTopScores(
+				getApiClient(),
+				leaderboardId,
+				LeaderboardVariant.TIME_SPAN_ALL_TIME,
+				LeaderboardVariant.COLLECTION_SOCIAL,
+				25,
+				true
+		).setResultCallback(new ScoresLoadedListener());
+    }
+
+    public void onLeaderboardLoaded( LeaderboardScoreBuffer scores ) {
+        dispatchEvent( "ON_LEADERBOARD_LOADED", scoresToJsonString(scores) );
+    }
+    private String scoresToJsonString( LeaderboardScoreBuffer scores ) {
+
+        int scoresNb = scores.getCount();
+        JSONArray jsonScores = new JSONArray();
+        for ( int i = 0; i < scoresNb; ++i ) {
+            LeaderboardScore score = scores.get(i);
+            JSONObject jsonScore = new JSONObject();
+            try {
+                jsonScore.put("value", score.getRawScore());
+                jsonScore.put("rank", score.getRank());
+
+                Player player = score.getScoreHolder();
+                JSONObject jsonPlayer = new JSONObject();
+                jsonPlayer.put("id", player.getPlayerId());
+                jsonPlayer.put("displayName", player.getDisplayName());
+                jsonPlayer.put("picture", player.getIconImageUri());
+
+                jsonScore.put("player", jsonPlayer);
+
+                jsonScores.put( jsonScore );
+
+            } catch( JSONException e ) {}
+        }
+        return jsonScores.toString();
+
+    }
 
 	@Override
 	public void onSignInFailed() {

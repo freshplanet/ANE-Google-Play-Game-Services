@@ -35,8 +35,6 @@ public class AirGooglePlayGamesReportAchievementFunction implements FREFunction 
 			Extension.context.reportAchivements(achievementId, percent);
 		}
 		
-		
-		
 		return null;
 	}
 

@@ -23,17 +23,17 @@
             </classpath>
         </javac>
         
-        <!--<mkdir dir="../android/temp/zip"/>
-        <unzip src="${gplayservices.libs}/libs/google-play-services.jar" dest="../android/temp/zip" />
-        <copydir src="../android/temp/zip/com" dest="../android/temp/classes/com"/>-->
+        <!-- <mkdir dir="../android/temp/zip"/>
+        <unzip src="../android/google-play-services_lib/libs/google-play-services.jar" dest="../android/temp/zip" />
+        <copydir src="../android/temp/zip/com" dest="../android/temp/classes/com"/>
 
-        <!--<copy todir="../temp/android/res/">
-            <fileset dir="${gplayservices.libs}/bin/res"/>
-        </copy>
+        <copy todir="../temp/android/res/">
+            <fileset dir="../android/google-play-services_lib/bin/res"/>
+        </copy> -->
         
-        <copy todir="../temp/android/res/values/">
+        <!-- <copy todir="../temp/android/res/values/">
             <fileset dir="${gplayservices.libs}/res/values"/>
-        </copy>-->
+        </copy> -->
         
         
         <mkdir dir="../temp/android/"/>
@@ -54,6 +54,7 @@
         </pathconvert>
 
         <exec executable="${flex.sdk}/bin/compc${bin.ext}" failonerror="true">
+            <env key="AIR_SDK_HOME" value="${flex.sdk}"/>
             <arg line='-source-path ../actionscript/src'/>
             <arg line='-output ../temp/swc/${name}.swc'/>
             <arg line='-swf-version=14'/>

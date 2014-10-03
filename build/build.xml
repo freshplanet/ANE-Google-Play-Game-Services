@@ -12,25 +12,28 @@
         <delete dir="../android/temp"/>
         <mkdir dir="../android/temp/classes"/>
 
-        <javac srcdir="../android/src" destdir="../android/temp/classes" includeantruntime="false">
+        <echo message="Using Java version ${ant.java.version}."/>
+
+        <javac source="1.6" srcdir="../android/src" destdir="../android/temp/classes" includeantruntime="false">
             <classpath>
                 <pathelement location="${android.sdk}/android.jar"/>
                 <pathelement location="${flex.sdk}/lib/android/FlashRuntimeExtensions.jar"/>
-                <pathelement location="${gplayservices.libs}/libs/google-play-services.jar"/>
+                <pathelement location="../android/AirMoPub/libs/android-support-v4.jar"/>
+                <pathelement location="../android/google-play-services_lib/libs/google-play-services.jar"/>
             </classpath>
         </javac>
         
-        <mkdir dir="../android/temp/zip"/>
-        <unzip src="${gplayservices.libs}/libs/google-play-services.jar" dest="../android/temp/zip" />
+        <!-- <mkdir dir="../android/temp/zip"/>
+        <unzip src="../android/google-play-services_lib/libs/google-play-services.jar" dest="../android/temp/zip" />
         <copydir src="../android/temp/zip/com" dest="../android/temp/classes/com"/>
 
         <copy todir="../temp/android/res/">
-            <fileset dir="${gplayservices.libs}/bin/res"/>
-        </copy>
+            <fileset dir="../android/google-play-services_lib/bin/res"/>
+        </copy> -->
         
-        <copy todir="../temp/android/res/values/">
+        <!-- <copy todir="../temp/android/res/values/">
             <fileset dir="${gplayservices.libs}/res/values"/>
-        </copy>
+        </copy> -->
         
         
         <mkdir dir="../temp/android/"/>
@@ -51,6 +54,7 @@
         </pathconvert>
 
         <exec executable="${flex.sdk}/bin/compc${bin.ext}" failonerror="true">
+            <env key="AIR_SDK_HOME" value="${flex.sdk}"/>
             <arg line='-source-path ../actionscript/src'/>
             <arg line='-output ../temp/swc/${name}.swc'/>
             <arg line='-swf-version=14'/>

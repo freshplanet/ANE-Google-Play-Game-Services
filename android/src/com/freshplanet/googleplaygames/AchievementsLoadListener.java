@@ -25,7 +25,7 @@ public class AchievementsLoadListener implements OnAchievementsLoadedListener{
 		if(percent <= 0)
 			return;
 		
-		Extension.context.getGamesClient().incrementAchievement(achievementId,percent);
+//		Extension.context.getGamesClient().incrementAchievement(achievementId,percent);
 	}
 	
 	@Override

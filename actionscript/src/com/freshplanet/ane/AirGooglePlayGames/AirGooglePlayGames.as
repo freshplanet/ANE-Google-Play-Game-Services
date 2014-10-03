@@ -18,6 +18,7 @@
 
 package com.freshplanet.ane.AirGooglePlayGames
 {
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.StatusEvent;
 	import flash.external.ExtensionContext;
@@ -120,6 +121,12 @@ package com.freshplanet.ane.AirGooglePlayGames
 			return name;
 		}
 		
+		public function getLeaderboard( leaderboardId:String ):void
+		{
+			if (AirGooglePlayGames.isSupported)
+				_context.call("getLeaderboard", leaderboardId );
+		}
+		
 		
 		// --------------------------------------------------------------------------------------//
 		//																						 //
@@ -136,7 +143,7 @@ package com.freshplanet.ane.AirGooglePlayGames
 		private function onStatus( event : StatusEvent ) : void
 		{
 			trace("[AirGooglePlayGames]", event);
-			var e:AirGooglePlayGamesEvent;
+			var e:Event;
 			if (event.code == "ON_SIGN_IN_SUCCESS")
 			{
 				e = new AirGooglePlayGamesEvent(AirGooglePlayGamesEvent.ON_SIGN_IN_SUCCESS);
@@ -146,10 +153,20 @@ package com.freshplanet.ane.AirGooglePlayGames
 			} else if (event.code == "ON_SIGN_OUT_SUCCESS")
 			{
 				e = new AirGooglePlayGamesEvent(AirGooglePlayGamesEvent.ON_SIGN_OUT_SUCCESS);
+			} else if (event.code == "ON_LEADERBOARD_LOADED")
+			{
+				var jsonArray:Array = JSON.parse( event.level ) as Array;
+				if( jsonArray ) {
+					var leaderboard:GSLeaderboard = GSLeaderboard.fromJSONObject( jsonArray );
+					if( leaderboard )
+						e = new AirGooglePlayGamesLeaderboardEvent(AirGooglePlayGamesLeaderboardEvent.LEADERBOARD_LOADED, leaderboard);
+				}
+			} else if (event.code == "ON_LEADERBOARD_FAILED")
+			{
+				e = new Event(AirGooglePlayGamesLeaderboardEvent.LEADERBOARD_LOADING_FAILED );
 			}
 			
-			if (e)
-			{
+			if (e) {
 				this.dispatchEvent(e);
 			}
 		}

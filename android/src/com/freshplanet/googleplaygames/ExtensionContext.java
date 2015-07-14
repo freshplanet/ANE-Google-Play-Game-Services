@@ -149,7 +149,7 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 	{
 		if (percentDouble > 0 && percentDouble <= 1){
     		int percent = (int) (percentDouble * 100);
-    		Games.Achievements.increment(getApiClient(), achievementId, percent);
+    		Games.Achievements.setSteps(getApiClient(), achievementId, percent);
     	}
 	}
 	

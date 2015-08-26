@@ -91,7 +91,7 @@ package com.freshplanet.ane.AirGooglePlayGames
 		{
 			if (AirGooglePlayGames.isSupported)
 			{
-				_context.call("reportAchievemnt", achievementId, percent);
+				_context.call("reportAchievement", achievementId, percent);
 			}
 		}
 		

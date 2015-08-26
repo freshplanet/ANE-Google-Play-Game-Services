@@ -65,7 +65,7 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 		functionMap.put("startAtLaunch", new AirGooglePlayStartAtLaunch());
 		functionMap.put("signIn", new AirGooglePlayGamesSignInFunction());
 		functionMap.put("signOut", new AirGooglePlayGamesSignOutFunction());
-		functionMap.put("reportAchievemnt", new AirGooglePlayGamesReportAchievementFunction());
+		functionMap.put("reportAchievement", new AirGooglePlayGamesReportAchievementFunction());
 		functionMap.put("reportScore", new AirGooglePlayGamesReportScoreFunction());
 		functionMap.put("showStandardAchievements", new AirGooglePlayGamesShowAchievementsFunction());
 		functionMap.put("getActivePlayerName", new AirGooglePlayGamesGetActivePlayerName());

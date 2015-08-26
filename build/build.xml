@@ -70,7 +70,7 @@
             <arg line='-include-classes ${classlist}'/>
         </exec>
 
-        <unzip src="../temp/swc/${name}.swc" dest="temp/swc/content" overwrite="true"/>
+        <unzip src="temp/swc/${name}.swc" dest="temp/swc/content" overwrite="true"/>
 
         <copy file="temp/swc/content/library.swf" todir="temp/ios" overwrite="true"/>
         <copy file="temp/swc/content/library.swf" todir="temp/ios-simulator" overwrite="true"/>

@@ -126,7 +126,11 @@ package com.freshplanet.ane.AirGooglePlayGames
 			if (AirGooglePlayGames.isSupported)
 				_context.call("getLeaderboard", leaderboardId );
 		}
-		
+		public function showLeaderboardUI( leaderboardId:String ):void
+		{
+			if (AirGooglePlayGames.isSupported)
+				_context.call("showLeaderboardUI", leaderboardId );
+		}
 		
 		// --------------------------------------------------------------------------------------//
 		//																						 //

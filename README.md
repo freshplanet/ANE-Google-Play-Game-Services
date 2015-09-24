@@ -1,3 +1,10 @@
+Added function for displaying default leaderboard UI https://developers.google.com/games/services/android/leaderboards 
+
+AirGooglePlayGames.getInstance().showLeaderboardUI(LEADERBOARD_ID); //display leaderboard by id
+AirGooglePlayGames.getInstance().showLeaderboardUI(); // display all leaderboards
+
+
+
 Air Native Extension for Google Play Games Services (Android)
 ======================================
 

@@ -31,6 +31,7 @@ import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesShowAchieveme
 import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesSignInFunction;
 import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesSignOutFunction;
 import com.freshplanet.googleplaygames.functions.AirGooglePlayStartAtLaunch;
+import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesShowLeaderboardUIFuction;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.Player;
@@ -70,6 +71,8 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 		functionMap.put("showStandardAchievements", new AirGooglePlayGamesShowAchievementsFunction());
 		functionMap.put("getActivePlayerName", new AirGooglePlayGamesGetActivePlayerName());
         functionMap.put("getLeaderboard", new AirGooglePlayGamesGetLeaderboardFunction());
+		functionMap.put("showLeaderboardUI", new AirGooglePlayGamesShowLeaderboardUIFuction());
+
 		return functionMap;
 	}
 	
@@ -159,7 +162,7 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 	}
 
     public void getLeaderboard( String leaderboardId ) {
-
+		
 		Games.Leaderboards.loadTopScores(
 				getApiClient(),
 				leaderboardId,

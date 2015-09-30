@@ -70,6 +70,17 @@ package com.freshplanet.ane.AirGooglePlayGames
 				_context.call("startAtLaunch");
 			}
 		}
+
+		public function isSignedIn():Boolean
+		{
+			var signedIn:Boolean = false;
+			if (AirGooglePlayGames.isSupported)
+			{
+				signedIn = _context.call("isSignedIn") as Boolean;
+			}
+
+			return signedIn;
+		}
 		
 		public function signIn():void
 		{

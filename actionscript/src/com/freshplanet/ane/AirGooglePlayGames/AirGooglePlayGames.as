@@ -63,14 +63,6 @@ package com.freshplanet.ane.AirGooglePlayGames
 			return _instance ? _instance : new AirGooglePlayGames();
 		}
 		
-		public function startAtLaunch():void
-		{
-			if (AirGooglePlayGames.isSupported)
-			{
-				_context.call("startAtLaunch");
-			}
-		}
-
 		public function isSignedIn():Boolean
 		{
 			var signedIn:Boolean = false;

@@ -71,7 +71,6 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 	public Map<String, FREFunction> getFunctions()
 	{
 		Map<String, FREFunction> functionMap = new HashMap<String, FREFunction>();
-		functionMap.put("startAtLaunch", new AirGooglePlayStartAtLaunch());
 		functionMap.put("signIn", new AirGooglePlayGamesSignInFunction());
 		functionMap.put("signOut", new AirGooglePlayGamesSignOutFunction());
 		functionMap.put("reportAchievement", new AirGooglePlayGamesReportAchievementFunction());

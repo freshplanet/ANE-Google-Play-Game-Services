@@ -4,12 +4,9 @@ import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
 import com.adobe.fre.FREObject;
 import com.freshplanet.googleplaygames.Extension;
-import com.google.android.gms.games.Games;
 
 public class AirGooglePlayGamesShowAchievementsFunction implements FREFunction {
 	
-    final int RC_UNUSED = 5001;
-    
 	public AirGooglePlayGamesShowAchievementsFunction() {
 		// TODO Auto-generated constructor stub
 	}
@@ -19,10 +16,9 @@ public class AirGooglePlayGamesShowAchievementsFunction implements FREFunction {
 
 		Extension.context.createHelperIfNeeded(arg0.getActivity());
         if (Extension.context.isSignedIn()) {
-        	arg0.getActivity().startActivityForResult(Games.Achievements.getAchievementsIntent(Extension.context.getApiClient()), RC_UNUSED);
+        	Extension.context.showAchievements();
         }
 		
 		return null;
 	}
-
 }

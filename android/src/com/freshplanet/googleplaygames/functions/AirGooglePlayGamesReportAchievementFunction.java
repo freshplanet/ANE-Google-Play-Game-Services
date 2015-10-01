@@ -29,10 +29,10 @@ public class AirGooglePlayGamesReportAchievementFunction implements FREFunction 
 		Extension.context.createHelperIfNeeded(arg0.getActivity());
 		if (percent == 0) // it means we have unlocked it.
 		{
-			Extension.context.reportAchivements(achievementId);
+			Extension.context.reportAchievements(achievementId);
 		} else
 		{
-			Extension.context.reportAchivements(achievementId, percent);
+			Extension.context.reportAchievements(achievementId, percent);
 		}
 		
 		return null;

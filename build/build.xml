@@ -26,6 +26,7 @@
                 <pathelement location="${google.play.services.path}/libs/google-play-services.jar"/>
                 <pathelement location="${android.support.v4.path}/android-support-v4.jar"/>
                 <pathelement location="${air.sdk.home}/lib/android/FlashRuntimeExtensions.jar"/>
+                <pathelement location="${air.sdk.home}/lib/android/lib/runtimeClasses.jar"/>
             </classpath>
         </javac>
 

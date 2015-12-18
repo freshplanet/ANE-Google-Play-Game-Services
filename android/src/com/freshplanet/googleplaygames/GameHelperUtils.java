@@ -1,6 +1,5 @@
 package com.freshplanet.googleplaygames;
 
-import android.R;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -32,10 +31,9 @@ class GameHelperUtils {
 
     private final static int[] RES_IDS = {
     	0,1,2,3
-//            R.string.gamehelper_unknown_error, R.string.gamehelper_sign_in_failed,
-//            R.string.gamehelper_app_misconfigured, R.string.gamehelper_license_failed
+            //R.string.gamehelper_unknown_error, R.string.gamehelper_sign_in_failed,
+            //R.string.gamehelper_app_misconfigured, R.string.gamehelper_license_failed
     };
-
     static String activityResponseCodeToString(int respCode) {
         switch (respCode) {
             case Activity.RESULT_OK:

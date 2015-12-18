@@ -7,7 +7,7 @@ This is an [Air native extension](http://www.adobe.com/devnet/air/native-extensi
 Installation
 ---------
 
-The ANE binary (AirGooglePlayGamesService.ane) is located in the *bin* folder. You should add it to your application project's Build Path and make sure to package it with your app (more information [here](http://help.adobe.com/en_US/air/build/WS597e5dadb9cc1e0253f7d2fc1311b491071-8000.html)).
+The ANE binary (AirGooglePlayGameServices.ane) is located in the *bin* folder. You should add it to your application project's Build Path and make sure to package it with your app (more information [here](http://help.adobe.com/en_US/air/build/WS597e5dadb9cc1e0253f7d2fc1311b491071-8000.html)).
 
 
 Usage
@@ -41,6 +41,13 @@ AirGooglePlayGames.getInstance().reportScore(leaderbordId, value);
 
 // Show Achivements
 AirGooglePlayGames.getInstance().showStandardAchievements();
+
+// Get Player Name
+AirGooglePlayGames.getInstance().getActivePlayerID();
+
+// Get Player Score
+AirGooglePlayGames.getInstance().addEventListener(AirGooglePlayGamesEvent.ON_SCORE_LOADED, onScoreLoaded);
+AirGooglePlayGames.getInstance(). getActivePlayerScore(leaderbordId);
 ```
 
 

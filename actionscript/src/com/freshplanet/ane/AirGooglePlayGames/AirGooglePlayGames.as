@@ -63,12 +63,15 @@ package com.freshplanet.ane.AirGooglePlayGames
 			return _instance ? _instance : new AirGooglePlayGames();
 		}
 		
-		public function startAtLaunch():void
+		public function isSignedIn():Boolean
 		{
+			var signedIn:Boolean = false;
 			if (AirGooglePlayGames.isSupported)
 			{
-				_context.call("startAtLaunch");
+				signedIn = _context.call("isSignedIn") as Boolean;
 			}
+
+			return signedIn;
 		}
 		
 		public function signIn():void
@@ -91,7 +94,7 @@ package com.freshplanet.ane.AirGooglePlayGames
 		{
 			if (AirGooglePlayGames.isSupported)
 			{
-				_context.call("reportAchievemnt", achievementId, percent);
+				_context.call("reportAchievement", achievementId, percent);
 			}
 		}
 		
@@ -120,7 +123,21 @@ package com.freshplanet.ane.AirGooglePlayGames
 			}
 			return name;
 		}
-		
+
+		public function getActivePlayerID():String
+		{
+			var id:String;
+			if (AirGooglePlayGames.isSupported)
+				id = _context.call("getActivePlayerID") as String;
+			return id;
+		}
+
+		public function getActivePlayerScore( leaderboardId:String )
+		{
+			if (AirGooglePlayGames.isSupported)
+				_context.call("getActivePlayerScore", leaderboardId );
+		}
+
 		public function getLeaderboard( leaderboardId:String ):void
 		{
 			if (AirGooglePlayGames.isSupported)
@@ -134,7 +151,7 @@ package com.freshplanet.ane.AirGooglePlayGames
 		// 																						 //
 		// --------------------------------------------------------------------------------------//
 		
-		private static const EXTENSION_ID : String = "com.freshplanet.AirGooglePlayGamesService";
+		private static const EXTENSION_ID : String = "com.freshplanet.AirGooglePlayGameServices";
 		
 		private static var _instance : AirGooglePlayGames;
 		
@@ -161,9 +178,12 @@ package com.freshplanet.ane.AirGooglePlayGames
 					if( leaderboard )
 						e = new AirGooglePlayGamesLeaderboardEvent(AirGooglePlayGamesLeaderboardEvent.LEADERBOARD_LOADED, leaderboard);
 				}
-			} else if (event.code == "ON_LEADERBOARD_FAILED")
-			{
+			} else if (event.code == "ON_LEADERBOARD_FAILED"){
+
 				e = new Event(AirGooglePlayGamesLeaderboardEvent.LEADERBOARD_LOADING_FAILED );
+			} else if (event.code == "ON_SCORE_LOADED"){
+
+				e = new AirGooglePlayGamesEvent(AirGooglePlayGamesEvent.ON_SCORE_LOADED, ""+event.level);
 			}
 			
 			if (e) {

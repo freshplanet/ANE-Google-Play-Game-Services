@@ -1,7 +1,8 @@
-<platform xmlns="http://ns.adobe.com/air/extension/15.0"> 
+<platform xmlns="http://ns.adobe.com/air/extension/20.0"> 
     <packagedDependencies>
         <!-- comment out this line if not including GPS -->
-        <!-- <packagedDependency>google-play-services.jar</packagedDependency>  -->
+        <!-- <packagedDependency>android-support-v4.jar</packagedDependency>
+         <packagedDependency>google-play-services.jar</packagedDependency>-->
     </packagedDependencies> 
     <packagedResources>
        <!--  <packagedResource>
@@ -10,9 +11,10 @@
         </packagedResource> -->
 
         <!-- comment out this block if not including GPS -->
-        <!-- <packagedResource> 
+         <!-- <packagedResource>
             <packageName>com.google.android.gms</packageName> 
             <folderName>google-play-services-res</folderName> 
-        </packagedResource> -->
+        </packagedResource>-->
+        
     </packagedResources>
 </platform>

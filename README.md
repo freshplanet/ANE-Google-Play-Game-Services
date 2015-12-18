@@ -41,6 +41,13 @@ AirGooglePlayGames.getInstance().reportScore(leaderbordId, value);
 
 // Show Achivements
 AirGooglePlayGames.getInstance().showStandardAchievements();
+
+// Get Player Name
+AirGooglePlayGames.getInstance().getActivePlayerID();
+
+// Get Player Score
+AirGooglePlayGames.getInstance().addEventListener(AirGooglePlayGamesEvent.ON_SCORE_LOADED, onScoreLoaded);
+AirGooglePlayGames.getInstance(). getActivePlayerScore(leaderbordId);
 ```
 
 

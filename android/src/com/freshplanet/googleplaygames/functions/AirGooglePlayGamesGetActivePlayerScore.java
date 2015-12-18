@@ -5,12 +5,9 @@ import com.adobe.fre.FREFunction;
 import com.adobe.fre.FREObject;
 import com.freshplanet.googleplaygames.Extension;
 
-/**
- * Created by renaud on 09/09/2014.
- */
-public class AirGooglePlayGamesGetLeaderboardFunction implements FREFunction {
-
-    @Override
+public class AirGooglePlayGamesGetActivePlayerScore implements FREFunction {
+	
+	@Override
     public FREObject call(FREContext arg0, FREObject[] arg1) {
 
         Extension.context.createHelperIfNeeded(arg0.getActivity());
@@ -28,7 +25,7 @@ public class AirGooglePlayGamesGetLeaderboardFunction implements FREFunction {
         }
 
         if( leaderboardId != null )
-            Extension.context.getLeaderboard( leaderboardId );
+            Extension.context.getPlayerScore( leaderboardId );
 
 		return null;
 

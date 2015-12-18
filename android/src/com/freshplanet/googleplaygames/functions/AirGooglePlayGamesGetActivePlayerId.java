@@ -8,7 +8,7 @@ import com.freshplanet.googleplaygames.Extension;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.Player;
 
-public class AirGooglePlayGamesGetActivePlayerName implements FREFunction {
+public class AirGooglePlayGamesGetActivePlayerId implements FREFunction {
 
 	@Override
 	public FREObject call(FREContext arg0, FREObject[] arg1) {
@@ -16,17 +16,17 @@ public class AirGooglePlayGamesGetActivePlayerName implements FREFunction {
 		Extension.context.createHelperIfNeeded(arg0.getActivity());
 		Player player = Games.Players.getCurrentPlayer(Extension.context.getApiClient());
 		
-		FREObject playerName = null;
+		FREObject playerID = null;
 		if (player != null)
 		{
 			try {
-				playerName = FREObject.newObject(player.getDisplayName());
+				playerID = FREObject.newObject(player.getPlayerId());
 			} catch (FREWrongThreadException e) {
 				e.printStackTrace();
 			}
 		}
 		
-		return playerName;
+		return playerID;
 	}
 
 }

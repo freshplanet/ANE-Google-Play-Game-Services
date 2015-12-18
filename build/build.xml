@@ -47,7 +47,7 @@
         </copy> -->
 
         <!-- android support libraries -->
-        <!-- <copy file="${android.support.v4.path}/android-support-v4.jar" todir="temp/android/"/> -->
+         <!-- <copy file="${android.support.v4.path}/android-support-v4.jar" todir="temp/android/"/> -->
     </target>
 
     <!-- Actionscript -->

@@ -28,12 +28,14 @@ import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
 import com.freshplanet.googleplaygames.functions.*;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.leaderboard.LeaderboardScore;
 import com.google.android.gms.games.leaderboard.LeaderboardScoreBuffer;
 import com.google.android.gms.games.leaderboard.LeaderboardVariant;
+import com.google.android.gms.games.leaderboard.Leaderboards.LoadPlayerScoreResult;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,7 +52,7 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
     private AndroidActivityWrapper aaw = null;
 
     final int RC_SHOW_ACHIEVEMENTS = 4237;
-
+    
     public ExtensionContext()
     {
         aaw = AndroidActivityWrapper.GetAndroidActivityWrapper();
@@ -77,6 +79,8 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 		functionMap.put("reportScore", new AirGooglePlayGamesReportScoreFunction());
 		functionMap.put("showStandardAchievements", new AirGooglePlayGamesShowAchievementsFunction());
 		functionMap.put("getActivePlayerName", new AirGooglePlayGamesGetActivePlayerName());
+		functionMap.put("getActivePlayerID", new AirGooglePlayGamesGetActivePlayerId());
+		functionMap.put("getActivePlayerScore", new AirGooglePlayGamesGetActivePlayerScore());
 		functionMap.put("getLeaderboard", new AirGooglePlayGamesGetLeaderboardFunction());
 		functionMap.put("isSignedIn", new AirGooglePlayGamesIsSignedInFunction());
 		return functionMap;
@@ -197,7 +201,25 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 				true
 		).setResultCallback(new ScoresLoadedListener());
     }
-
+    public void getPlayerScore( String leaderboardId) {
+    	Games.Leaderboards.loadCurrentPlayerLeaderboardScore(
+				getApiClient(),
+				leaderboardId,
+				LeaderboardVariant.TIME_SPAN_ALL_TIME,
+				LeaderboardVariant.COLLECTION_PUBLIC
+		).setResultCallback(
+	            new ResultCallback<LoadPlayerScoreResult>() {
+	                @Override
+	                public void onResult(LoadPlayerScoreResult arg0) {
+	                    LeaderboardScore c = arg0.getScore();
+	                    onScoreLoaded(""+c.getRawScore());
+	                }
+	             }
+	      );
+    }
+    public void onScoreLoaded(String score){
+    	dispatchEvent( "ON_SCORE_LOADED", score);
+    }
     public void onLeaderboardLoaded( LeaderboardScoreBuffer scores ) {
         dispatchEvent( "ON_LEADERBOARD_LOADED", scoresToJsonString(scores) );
     }

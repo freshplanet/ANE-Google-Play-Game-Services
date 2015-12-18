@@ -28,7 +28,8 @@ You need to add the following in your AIR manifest, and replace YOUR_APP_ID by t
 AirGooglePlayGames.getInstance().addEventListener(AirGooglePlayGamesEvent.ON_SIGN_IN_SUCCESS, onSignInSuccess);
 AirGooglePlayGames.getInstance().addEventListener(AirGooglePlayGamesEvent.ON_SIGN_OUT_SUCCESS, onSignOutSuccess);
 AirGooglePlayGames.getInstance().addEventListener(AirGooglePlayGamesEvent.ON_SIGN_IN_FAIL, onSignInFail);
-AirGooglePlayGames.getInstance().startAtLaunch();
+AirGooglePlayGames.getInstance().isSignedIn();
+AirGooglePlayGames.getInstance().signIn();
 
 // Update Achievement
 // with steps
@@ -47,7 +48,7 @@ AirGooglePlayGames.getInstance().getActivePlayerID();
 
 // Get Player Score
 AirGooglePlayGames.getInstance().addEventListener(AirGooglePlayGamesEvent.ON_SCORE_LOADED, onScoreLoaded);
-AirGooglePlayGames.getInstance(). getActivePlayerScore(leaderbordId);
+AirGooglePlayGames.getInstance().getActivePlayerScore(leaderbordId);
 ```
 
 

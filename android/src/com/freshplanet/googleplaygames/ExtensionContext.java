@@ -83,6 +83,8 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 		functionMap.put("getActivePlayerScore", new AirGooglePlayGamesGetActivePlayerScore());
 		functionMap.put("getLeaderboard", new AirGooglePlayGamesGetLeaderboardFunction());
 		functionMap.put("isSignedIn", new AirGooglePlayGamesIsSignedInFunction());
+		functionMap.put("showLeaderboards", new AirGooglePlayGamesShowLeaderboardFunction());
+		functionMap.put("showLeaderboard", new AirGooglePlayGamesShowLeaderboardFunction());
 		return functionMap;
 	}
 
@@ -200,6 +202,14 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 				25,
 				true
 		).setResultCallback(new ScoresLoadedListener());
+    }
+    public void showLeaderboard( String leaderboardId ) {
+    	Intent leaderboardIntent = Games.Leaderboards.getLeaderboardIntent(Extension.context.getApiClient(),leaderboardId);        
+        getActivity().startActivityForResult(leaderboardIntent, GameHelper.RC_UNUSED);
+    }
+    public void showLeaderboards() {
+    	Intent leaderboardsIntent = Games.Leaderboards.getAllLeaderboardsIntent(Extension.context.getApiClient());  
+    	getActivity().startActivityForResult(leaderboardsIntent, GameHelper.RC_UNUSED);
     }
     public void getPlayerScore( String leaderboardId) {
     	Games.Leaderboards.loadCurrentPlayerLeaderboardScore(

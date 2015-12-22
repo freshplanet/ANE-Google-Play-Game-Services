@@ -113,7 +113,23 @@ package com.freshplanet.ane.AirGooglePlayGames
 				_context.call("showStandardAchievements");
 			}
 		}
-		
+
+		public function showLeaderboards():void
+		{
+			if (AirGooglePlayGames.isSupported)
+			{
+				_context.call("showLeaderboards");
+			}
+		}
+
+		public function showLeaderboard( leaderboardId:String ):void
+		{
+			if (AirGooglePlayGames.isSupported)
+			{
+				_context.call("showLeaderboard", leaderboardId);
+			}
+		}
+
 		public function getActivePlayerName():String
 		{
 			var name:String;

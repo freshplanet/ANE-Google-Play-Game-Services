@@ -25,8 +25,8 @@
                 <pathelement location="${android.platform.home}/android.jar"/>
                 <pathelement location="${google.play.services.path}/libs/google-play-services.jar"/>
                 <pathelement location="${android.support.v4.path}/android-support-v4.jar"/>
-                <pathelement location="${air.sdk.home}/lib/android/FlashRuntimeExtensions.jar"/>
-                <pathelement location="${air.sdk.home}/lib/android/lib/runtimeClasses.jar"/>
+                <pathelement location="${flex.sdk}/lib/android/FlashRuntimeExtensions.jar"/>
+                <pathelement location="${flex.sdk}/lib/android/lib/runtimeClasses.jar"/>
             </classpath>
         </javac>
 
@@ -47,7 +47,7 @@
         </copy> -->
 
         <!-- android support libraries -->
-         <!-- <copy file="${android.support.v4.path}/android-support-v4.jar" todir="temp/android/"/> -->
+        <!-- <copy file="${android.support.v4.path}/android-support-v4.jar" todir="temp/android/"/> -->
     </target>
 
     <!-- Actionscript -->
@@ -62,26 +62,25 @@
             <regexpmapper from=".*src.(.*)\.as" to="\1"/>
         </pathconvert>
 
-        <exec executable="${air.sdk.home}/bin/compc" failonerror="true">
-            <env key="AIR_SDK_HOME" value="${air.sdk.home}"/>
+        <exec executable="${flex.sdk}/bin/compc" failonerror="true">
+            <env key="AIR_SDK_HOME" value="${flex.sdk}"/>
             <arg line='-source-path ../actionscript/src'/>
             <arg line='-output temp/swc/${name}.swc'/>
             <arg line='-swf-version=25'/>
-            <arg line='-external-library-path+="${air.sdk.home}/frameworks/libs/air/airglobal.swc"'/>
+            <arg line='-external-library-path+="${flex.sdk}/frameworks/libs/air/airglobal.swc"'/>
             <arg line='-include-classes ${classlist}'/>
         </exec>
 
         <unzip src="temp/swc/${name}.swc" dest="temp/swc/content" overwrite="true"/>
 
         <copy file="temp/swc/content/library.swf" todir="temp/ios" overwrite="true"/>
-        <copy file="temp/swc/content/library.swf" todir="temp/ios-simulator" overwrite="true"/>
         <copy file="temp/swc/content/library.swf" todir="temp/android" overwrite="true"/>
         <copy file="temp/swc/content/library.swf" todir="temp/default" overwrite="true"/>
     </target>
 
     <!-- Package -->
     <target name="package" description="Create the extension package">
-        <exec executable="${air.sdk.home}/bin/adt" failonerror="true" dir="temp/">
+        <exec executable="${flex.sdk}/bin/adt" failonerror="true" dir="temp/">
             <arg value="-package"/>
             <arg value="-target"/>
             <arg value="ane"/>
@@ -89,8 +88,7 @@
             <arg value="../extension.xml"/>
             <arg line="-swc swc/${name}.swc"/>
             <arg line="-platform iPhone-ARM -platformoptions ../platform-ios.xml -C ios/ . "/>
-            <arg line="-platform Android-ARM -platformoptions ../platform-android.xml -C android/ ."/>
-            <arg line="-platform default -C default/ ."/>
+            <arg line="-platform Android-ARM -platformoptions ../platform-android.xml -C android/ ."/>           	    <arg line="-platform default -C default/ ."/>
         </exec>
 
         <move file="temp/${name}.ane" todir="../bin"/>

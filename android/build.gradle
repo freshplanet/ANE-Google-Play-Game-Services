@@ -10,6 +10,8 @@ repositories {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.google.android.gms:play-services-games:9.4.0'
+    compile 'com.google.android.gms:play-services-plus:9.4.0'
 }
 
 android {

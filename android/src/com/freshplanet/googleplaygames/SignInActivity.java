@@ -36,7 +36,7 @@ public class SignInActivity extends Activity{
 	{
 		super.onStart();
 		Extension.context.logEvent("autosignIn");
-		mHelper.onStart(this, !shouldStartSignInFlow);
+		mHelper.onStart(this);
 		if (shouldStartSignInFlow)
 		{
 			Extension.context.logEvent("signIn");

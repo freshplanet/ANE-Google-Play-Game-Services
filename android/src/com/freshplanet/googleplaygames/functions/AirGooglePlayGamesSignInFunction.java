@@ -20,7 +20,7 @@ public class AirGooglePlayGamesSignInFunction implements FREFunction {
         Activity appActivity = arg0.getActivity();
         GameHelper mHelper = Extension.context.createHelperIfNeeded(null);
 
-        mHelper.onStart(appActivity, false);
+        mHelper.onStart(appActivity);
         mHelper.beginUserInitiatedSignIn();
 
         return null;

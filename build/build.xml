@@ -10,44 +10,51 @@
     <!-- Android -->
     <target name="android" description="Build Android Library">
 
-        <property name="android.platform.home" value="${android.sdk.home}/platforms/android-${android.platform}"/>
-        <property name="google.play.services.path" value="${android.sdk.home}/extras/google/google_play_services/libproject/google-play-services_lib"/>
+        <!-- paths -->
+        <property name="build" value="../android/build"/>
+        <property name="build.bundles" value="${build}/intermediates/bundles"/>
+        <property name="build.exploded-aar" value="${build}/intermediates/exploded-aar"/>
 
-        <property name="android.support.path" value="${android.sdk.home}/extras/android/support"/>
-        <property name="android.support.v4.path" value="${android.support.path}/v4"/>
-        
         <!-- make the build directory for the java code -->
-        <mkdir dir="temp/android/build/"/>
+        <mkdir dir="temp/android/"/>
+
+        <exec executable="/usr/libexec/java_home" outputproperty="java8home">
+            <!-- <arg line="-v 1.8" /> -->
+        </exec>
+
+        <!-- clean the build -->
+        <exec executable="./gradlew" dir="../">
+            <env key="JAVA_HOME" path="${java8home}"/>
+            <arg line="clean"/>
+        </exec>
 
         <!-- compile the java code -->
-        <javac source="1.7" target="1.7" srcdir="../android/src" destdir="temp/android/build/" includeantruntime="false">
-            <classpath>
-                <pathelement location="${android.platform.home}/android.jar"/>
-                <pathelement location="${google.play.services.path}/libs/google-play-services.jar"/>
-                <pathelement location="${android.support.v4.path}/android-support-v4.jar"/>
-                <pathelement location="${air.sdk.home}/lib/android/FlashRuntimeExtensions.jar"/>
-                <pathelement location="${air.sdk.home}/lib/android/lib/runtimeClasses.jar"/>
-            </classpath>
-        </javac>
+        <exec executable="./gradlew" dir="../">
+            <env key="JAVA_HOME" path="${java8home}"/>
+            <env key="ANDROID_HOME" path="${android.sdk.home}"/>
+            <arg line=":android:assembleRelease"/>
+        </exec>
 
-        <!-- make the jar -->
-        <jar basedir="temp/android/build/" destfile="temp/android/lib${name}.jar"/>
-
-        <!-- remove the build classes -->
-        <delete dir="temp/android/build/"/>
-        
-        <!-- Copy over the required libs -->
+        <!-- get the jar -->
+        <copy file="${build.bundles}/release/classes.jar" tofile="temp/android/lib${name}.jar"/>
 
         <!-- Copy over required resources -->
+        <copy todir="temp/android/res/">
+            <fileset dir="${build}/intermediates/res/release/"/>
+        </copy>
 
-        <!-- google play services -->
-        <!-- <copy file="${google.play.services.path}/libs/google-play-services.jar" todir="temp/android/"/>
-        <copy todir="temp/android/google-play-services-res/">
-            <fileset dir="${google.play.services.path}/res"/>
-        </copy> -->
+        <!-- Copy over the bundled libs -->
+        <copy todir="temp/android/">
+            <fileset dir="${build.bundles}/release/libs/" excludes="FlashRuntimeExtensions.jar, runtimeClasses.jar"/>
+        </copy>
 
-        <!-- android support libraries -->
-        <!-- <copy file="${android.support.v4.path}/android-support-v4.jar" todir="temp/android/"/> -->
+        <!-- Copy over the exploded aar libs -->
+        <exec executable="/bin/bash">
+            <arg value="copy_aars.sh"/>
+        </exec>
+
+        <!-- remove the build classes -->
+        <delete dir="../android/build/"/>
     </target>
 
     <!-- Actionscript -->
@@ -66,7 +73,7 @@
             <env key="AIR_SDK_HOME" value="${air.sdk.home}"/>
             <arg line='-source-path ../actionscript/src'/>
             <arg line='-output temp/swc/${name}.swc'/>
-            <arg line='-swf-version=25'/>
+            <arg line='-swf-version=29'/>
             <arg line='-external-library-path+="${air.sdk.home}/frameworks/libs/air/airglobal.swc"'/>
             <arg line='-include-classes ${classlist}'/>
         </exec>

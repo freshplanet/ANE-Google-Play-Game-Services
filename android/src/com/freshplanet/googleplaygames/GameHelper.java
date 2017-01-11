@@ -16,6 +16,8 @@
 
 package com.freshplanet.googleplaygames;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -27,16 +29,18 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
-import com.google.android.gms.appstate.AppStateManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.Api.ApiOptions.NoOptions;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.drive.Drive;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.Games.GamesOptions;
 import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
+import com.google.android.gms.games.request.GameRequest;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.Plus.PlusOptions;
 
@@ -72,7 +76,7 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
         /** Called when sign-in succeeds. */
         void onSignInSucceeded();
     }
-    
+
     // configuration done?
     private boolean mSetupDone = false;
 
@@ -117,10 +121,9 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
     public final static int CLIENT_NONE = 0x00;
     public final static int CLIENT_GAMES = 0x01;
     public final static int CLIENT_PLUS = 0x02;
-    public final static int CLIENT_APPSTATE = 0x04;
     public final static int CLIENT_SNAPSHOT = 0x08;
     public final static int CLIENT_ALL = CLIENT_GAMES | CLIENT_PLUS
-            | CLIENT_APPSTATE | CLIENT_SNAPSHOT;
+            | CLIENT_SNAPSHOT;
 
     // What clients were requested? (bit flags)
     int mRequestedClients = CLIENT_NONE;
@@ -148,7 +151,7 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
     boolean mShowErrorDialogs = true;
 
     // Print debug logs?
-    boolean mDebugLog = true;
+    boolean mDebugLog = false;
 
     Handler mHandler;
 
@@ -163,6 +166,12 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
      * here. Otherwise, it's null.
      */
     TurnBasedMatch mTurnBasedMatch;
+
+    /*
+     * If we have incoming requests when we connected to the games client, they
+     * are here. Otherwise, it's null.
+     */
+    ArrayList<GameRequest> mRequests;
 
     // Listener
     GameHelperListener mListener = null;
@@ -268,9 +277,9 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
             builder.addScope(Plus.SCOPE_PLUS_LOGIN);
         }
 
-        if (0 != (mRequestedClients & CLIENT_APPSTATE)) {
-            builder.addApi(AppStateManager.API);
-            builder.addScope(AppStateManager.SCOPE_APP_STATE);
+        if (0 != (mRequestedClients & CLIENT_SNAPSHOT)) {
+            builder.addScope(Drive.SCOPE_APPFOLDER);
+            builder.addApi(Drive.API);
         }
 
         mGoogleApiClientBuilder = builder;
@@ -349,12 +358,10 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
     }
 
     /** Call this method from your Activity's onStart(). */
-    public void onStart(Activity act, boolean connectOnStart) {
+    public void onStart(Activity act) {
         mActivity = act;
         mAppContext = act.getApplicationContext();
 
-        mConnectOnStart = connectOnStart;
-        
         debugLog("onStart");
         assertConfigured("onStart");
 
@@ -368,9 +375,14 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
                 mGoogleApiClient.connect();
             }
         } else {
-            debugLog("Not attempting to connect becase mConnectOnStart=false");
+            debugLog("Not attempting to connect because mConnectOnStart=false");
             debugLog("Instead, reporting a sign-in failure.");
-//            mHandler.postDelayed( () -> { notifyListener(false);}, 1000 );
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    notifyListener(false);
+                }
+            }, 1000);
         }
     }
 
@@ -436,7 +448,7 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public boolean hasRequests() {
-        return false;
+        return mRequests != null;
     }
 
     public void clearInvitation() {
@@ -448,6 +460,7 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public void clearRequests() {
+        mRequests = null;
     }
 
     /**
@@ -465,6 +478,24 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
                             + "that is, after getting onSignInSuceeded()");
         }
         return mTurnBasedMatch;
+    }
+
+    /**
+     * Returns the requests received through the onConnected bundle. This should
+     * be called from your GameHelperListener's
+     *
+     * @link{GameHelperListener#onSignInSucceeded method, to check if there are
+     *                                            incoming requests that must be
+     *                                            handled.
+     * @return The requests, or null if none were received.
+     */
+    public ArrayList<GameRequest> getRequests() {
+        if (!mGoogleApiClient.isConnected()) {
+            Log.w(TAG, "Warning: getRequests() should only be called "
+                    + "when signed in, "
+                    + "that is, after getting onSignInSucceeded()");
+        }
+        return mRequests;
     }
 
     /** Enables debug logging */
@@ -508,8 +539,7 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
         debugLog("Disconnecting client.");
         mConnectOnStart = false;
         mConnecting = false;
-		mConnectionResult = null;
-		mGoogleApiClient.disconnect();
+        mGoogleApiClient.disconnect();
     }
 
     /**
@@ -577,7 +607,7 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
     void notifyListener(boolean success) {
         debugLog("Notifying LISTENER of sign-in "
                 + (success ? "SUCCESS"
-                : mSignInFailureReason != null ? "FAILURE ("+ mSignInFailureReason.toString() +")"
+                : mSignInFailureReason != null ? "FAILURE (error)"
                 : "FAILURE (no error)"));
         if (mListener != null) {
             if (success) {
@@ -644,8 +674,7 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
             return;
         }
         debugLog("Starting connection.");
-		mConnectionResult = null;
-		mConnecting = true;
+        mConnecting = true;
         mInvitation = null;
         mTurnBasedMatch = null;
         mGoogleApiClient.connect();
@@ -681,6 +710,15 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
                 debugLog("Invitation ID: " + mInvitation.getInvitationId());
             }
 
+            // Do we have any requests pending?
+            mRequests = Games.Requests
+                    .getGameRequestsFromBundle(connectionHint);
+            if (!mRequests.isEmpty()) {
+                // We have requests in onConnected's connectionHint.
+                debugLog("onConnected: connection hint has " + mRequests.size()
+                        + " request(s)");
+            }
+
             debugLog("onConnected: connection hint provided. Checking for TBMP game.");
             mTurnBasedMatch = connectionHint
                     .getParcelable(Multiplayer.EXTRA_TURN_BASED_MATCH);
@@ -696,8 +734,7 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
         mConnectOnStart = true;
         mUserInitiatedSignIn = false;
         mConnecting = false;
-		mConnectionResult = null;
-		notifyListener(true);
+        notifyListener(true);
     }
 
     private final String GAMEHELPER_SHARED_PREFS = "GAMEHELPER_SHARED_PREFS";
@@ -800,6 +837,11 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
             return;
         }
 
+        if (mActivity == null) {
+            debugLog("No need to resolve issue, activity does not exist anymore");
+            return;
+        }
+
         debugLog("resolveConnectionResult: trying to resolve result: "
                 + mConnectionResult);
         if (mConnectionResult.hasResolution()) {
@@ -821,12 +863,14 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
             // error.
             debugLog("resolveConnectionResult: result has no resolution. Giving up.");
             giveUp(new SignInFailureReason(mConnectionResult.getErrorCode()));
+
+            mConnectionResult = null;
         }
     }
 
     public void disconnect() {
         if (mGoogleApiClient.isConnected()) {
-			debugLog("Disconnecting client.");
+            debugLog("Disconnecting client.");
             mGoogleApiClient.disconnect();
         } else {
             Log.w(TAG,

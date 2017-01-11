@@ -31,3 +31,8 @@ Thumbs.db
 #intellij
 .idea
 *.iml
+
+#gradle
+.gradle
+android/build
+local.properties

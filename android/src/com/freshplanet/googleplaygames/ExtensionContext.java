@@ -19,20 +19,17 @@
 package com.freshplanet.googleplaygames;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.util.Log;
 
+import com.adobe.air.ActivityResultCallback;
+import com.adobe.air.AndroidActivityWrapper;
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
-import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesGetActivePlayerName;
-import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesGetLeaderboardFunction;
-import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesReportAchievementFunction;
-import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesReportScoreFunction;
-import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesShowAchievementsFunction;
-import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesSignInFunction;
-import com.freshplanet.googleplaygames.functions.AirGooglePlayGamesSignOutFunction;
-import com.freshplanet.googleplaygames.functions.AirGooglePlayStartAtLaunch;
+import com.freshplanet.googleplaygames.functions.*;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.leaderboard.LeaderboardScore;
 import com.google.android.gms.games.leaderboard.LeaderboardScoreBuffer;
@@ -47,43 +44,71 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ExtensionContext extends FREContext implements GameHelper.GameHelperListener
+public class ExtensionContext extends FREContext implements GameHelper.GameHelperListener, ActivityResultCallback
 {
-	
-    final int RC_UNUSED = 5001;
-	// Public API
-	
-	public static GameHelper mHelper;
+    private static GameHelper mHelper = null;
+    private AndroidActivityWrapper aaw = null;
+
+    final int RC_SHOW_ACHIEVEMENTS = 4237;
+
+    public ExtensionContext()
+    {
+        aaw = AndroidActivityWrapper.GetAndroidActivityWrapper();
+        aaw.addActivityResultListener(this);
+    }
 	
 	@Override
-	public void dispose() { }
+	public void dispose()
+    {
+        if (aaw != null)
+        {
+            aaw.removeActivityResultListener(this);
+            aaw = null;
+        }
+    }
 
 	@Override
 	public Map<String, FREFunction> getFunctions()
 	{
 		Map<String, FREFunction> functionMap = new HashMap<String, FREFunction>();
-		functionMap.put("startAtLaunch", new AirGooglePlayStartAtLaunch());
 		functionMap.put("signIn", new AirGooglePlayGamesSignInFunction());
 		functionMap.put("signOut", new AirGooglePlayGamesSignOutFunction());
-		functionMap.put("reportAchievemnt", new AirGooglePlayGamesReportAchievementFunction());
+		functionMap.put("reportAchievement", new AirGooglePlayGamesReportAchievementFunction());
 		functionMap.put("reportScore", new AirGooglePlayGamesReportScoreFunction());
 		functionMap.put("showStandardAchievements", new AirGooglePlayGamesShowAchievementsFunction());
 		functionMap.put("getActivePlayerName", new AirGooglePlayGamesGetActivePlayerName());
-        functionMap.put("getLeaderboard", new AirGooglePlayGamesGetLeaderboardFunction());
+		functionMap.put("getLeaderboard", new AirGooglePlayGamesGetLeaderboardFunction());
+		functionMap.put("isSignedIn", new AirGooglePlayGamesIsSignedInFunction());
 		return functionMap;
 	}
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+
+        Extension.log("ExtensionContext.onActivityResult" +
+                " requestCode:" + Integer.toString(requestCode) +
+                " resultCode:" + Integer.toString(resultCode));
+
+        if (requestCode == RC_SHOW_ACHIEVEMENTS && resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED)
+        {
+            mHelper.disconnect();
+            mHelper = null;
+            dispatchEvent("ON_SIGN_OUT_SUCCESS");
+        }
+        else if (mHelper != null)
+        {
+            mHelper.onActivityResult(requestCode, resultCode, intent);
+        }
+    }
 	
-	public void dispatchEvent(String eventName)
-	{
-		dispatchEvent(eventName, "OK");
+	public void dispatchEvent(String eventName) {
+        dispatchEvent(eventName, "OK");
 	}
 	
-	public void logEvent(String eventName)
-	{
-		Log.i("[AirGooglePlayGames]", eventName);
+	public void logEvent(String eventName) {
+        Log.i("[AirGooglePlayGames]", eventName);
 	}
 
-	
 	public void dispatchEvent(String eventName, String eventData)
 	{
 		logEvent(eventName);
@@ -99,7 +124,7 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 		if (mHelper == null)
 		{
 			logEvent("create helper");
-			mHelper = new GameHelper(activity, GameHelper.CLIENT_GAMES | GameHelper.CLIENT_PLUS);
+			mHelper = new GameHelper(getActivity(), GameHelper.CLIENT_GAMES);// | GameHelper.CLIENT_PLUS);
 			logEvent("setup");
 			mHelper.setup(this);
 		}
@@ -122,12 +147,11 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
 		logEvent("signOut");
 
 		mHelper.signOut();
-		dispatchEvent("ON_SIGN_OUT_SUCCESS");
+        dispatchEvent("ON_SIGN_OUT_SUCCESS");
 	}
 
-	public Boolean isSignedIn()
-	{
-		logEvent("isSignedIn");
+	public Boolean isSignedIn() {
+        logEvent("isSignedIn");
         return mHelper.isSignedIn();
 	}
 	
@@ -135,8 +159,7 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
         return mHelper.getApiClient();
     }
 
-	
-	public void reportAchivements(String achievementId)
+	public void reportAchievements(String achievementId)
 	{
     	if (!isSignedIn()) {
             return;
@@ -144,8 +167,13 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
     	Games.Achievements.unlock(getApiClient(), achievementId);
 	}
 
-	
-	public void reportAchivements(String achievementId, double percentDouble)
+    public void showAchievements()
+    {
+        Intent achievementsIntent = Games.Achievements.getAchievementsIntent(mHelper.getApiClient());
+        getActivity().startActivityForResult(achievementsIntent, RC_SHOW_ACHIEVEMENTS);
+    }
+
+	public void reportAchievements(String achievementId, double percentDouble)
 	{
 		if (percentDouble > 0 && percentDouble <= 1){
     		int percent = (int) (percentDouble * 100);
@@ -173,6 +201,7 @@ public class ExtensionContext extends FREContext implements GameHelper.GameHelpe
     public void onLeaderboardLoaded( LeaderboardScoreBuffer scores ) {
         dispatchEvent( "ON_LEADERBOARD_LOADED", scoresToJsonString(scores) );
     }
+
     private String scoresToJsonString( LeaderboardScoreBuffer scores ) {
 
         int scoresNb = scores.getCount();

@@ -1,11 +1,12 @@
 package com.freshplanet.googleplaygames.functions;
 
-import android.content.Intent;
+import android.app.Activity;
 
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
 import com.adobe.fre.FREObject;
-import com.freshplanet.googleplaygames.SignInActivity;
+import com.freshplanet.googleplaygames.Extension;
+import com.freshplanet.googleplaygames.GameHelper;
 
 public class AirGooglePlayGamesSignInFunction implements FREFunction {
 
@@ -15,9 +16,14 @@ public class AirGooglePlayGamesSignInFunction implements FREFunction {
 
 	@Override
 	public FREObject call(FREContext arg0, FREObject[] arg1) {
-		Intent intent = new Intent(arg0.getActivity().getApplicationContext(), SignInActivity.class);
-		arg0.getActivity().startActivity(intent);
-		return null;
+
+        Activity appActivity = arg0.getActivity();
+        GameHelper mHelper = Extension.context.createHelperIfNeeded(null);
+
+        mHelper.onStart(appActivity);
+        mHelper.beginUserInitiatedSignIn();
+
+        return null;
 	}
 
 }

@@ -4,19 +4,18 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-public class SignInActivity extends Activity implements GameHelper.GameHelperListener {
+public class SignInActivity extends Activity{
 
 	private GameHelper mHelper;
-	
+
 	private boolean shouldStartSignInFlow;
-	
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		Extension.context.logEvent("sign in activiy started");
 		super.onCreate(savedInstanceState);
-		
+
 		Bundle extras = getIntent().getExtras();
 		shouldStartSignInFlow = true;
 
@@ -28,7 +27,7 @@ public class SignInActivity extends Activity implements GameHelper.GameHelperLis
 		}
 		Extension.context.logEvent("shouldStartSignInFlow2 : " +Boolean.toString(shouldStartSignInFlow));
 		mHelper = Extension.context.createHelperIfNeeded(this);
-		
+
 		Extension.context.registerActivity(this);
 	}
 
@@ -37,15 +36,15 @@ public class SignInActivity extends Activity implements GameHelper.GameHelperLis
 	{
 		super.onStart();
 		Extension.context.logEvent("autosignIn");
-		mHelper.onStart(this, !shouldStartSignInFlow);
+		mHelper.onStart(this);
 		if (shouldStartSignInFlow)
 		{
 			Extension.context.logEvent("signIn");
 			mHelper.beginUserInitiatedSignIn();
 		}
 	}
-	
-	
+
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
@@ -53,15 +52,4 @@ public class SignInActivity extends Activity implements GameHelper.GameHelperLis
 		mHelper.onActivityResult(requestCode, resultCode, data);
 		finish();
 	}
-
-	@Override
-	public void onSignInFailed() {
-		Extension.context.onSignInFailed();
-	}
-
-	@Override
-	public void onSignInSucceeded() {
-		Extension.context.onSignInSucceeded();
-	}
-
 }

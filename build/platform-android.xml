@@ -1,18 +1,23 @@
-<platform xmlns="http://ns.adobe.com/air/extension/15.0"> 
+<platform xmlns="http://ns.adobe.com/air/extension/20.0"> 
     <packagedDependencies>
-        <!-- comment out this line if not including GPS -->
-        <!-- <packagedDependency>google-play-services.jar</packagedDependency>  -->
+        <!-- support -->
+        <packagedDependency>support-v4-23.2.1.jar</packagedDependency>
+
+        <!-- google play services -->
+        <packagedDependency>play-services-drive-9.4.0.jar</packagedDependency>
+        <packagedDependency>play-services-games-9.4.0.jar</packagedDependency>
+        <packagedDependency>play-services-plus-9.4.0.jar</packagedDependency>
+
+        <!-- included externally -->
+        <!-- <packagedDependency>play-services-base-9.4.0.jar</packagedDependency>
+        <packagedDependency>play-services-basement-9.4.0.jar</packagedDependency>
+        <packagedDependency>play-services-tasks-9.4.0.jar</packagedDependency> -->
     </packagedDependencies> 
     <packagedResources>
-       <!--  <packagedResource>
-            <packageName>com.freshplanet.ane.AirMoPub</packageName> 
-            <folderName>res</folderName> 
-        </packagedResource> -->
-
-        <!-- comment out this block if not including GPS -->
+        <!-- included externally -->
         <!-- <packagedResource> 
             <packageName>com.google.android.gms</packageName> 
-            <folderName>google-play-services-res</folderName> 
+            <folderName>res</folderName> 
         </packagedResource> -->
     </packagedResources>
 </platform>

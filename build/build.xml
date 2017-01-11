@@ -53,6 +53,9 @@
             <arg value="copy_aars.sh"/>
         </exec>
 
+        <!-- <copy file="${build.exploded-aar}/com.android.support/support-v4/23.0.0/jars/libs/internal_impl-23.0.0.jar" 
+            tofile="temp/android/internal_impl-23.0.0.jar"/> -->
+
         <!-- remove the build classes -->
         <delete dir="../android/build/"/>
     </target>

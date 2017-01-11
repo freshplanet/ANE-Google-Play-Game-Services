@@ -16,7 +16,7 @@
 //  
 //////////////////////////////////////////////////////////////////////////////////////-->
 
-<extension xmlns="http://ns.adobe.com/air/extension/15.0">
+<extension xmlns="http://ns.adobe.com/air/extension/20.0">
     <id>com.freshplanet.AirGooglePlayGameServices</id>
     <versionNumber>1.0</versionNumber>
     <platforms>
